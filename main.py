@@ -4,11 +4,28 @@ import discord
 import requests
 import asyncio
 import time
+from flask import Flask
+from threading import Thread
 
 # Завантажуємо змінні з .env
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")  # Токен з .env
 
+# Налаштування Flask
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "I'm alive"  # Текст, що повертається при запиті
+
+def run():
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))  # Встановлюємо порт
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Discord бот
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
@@ -60,4 +77,6 @@ async def main():
         await client.start(TOKEN)
 
 if __name__ == "__main__":
+    keep_alive()  # Запускаємо Flask
     asyncio.run(main())
+
